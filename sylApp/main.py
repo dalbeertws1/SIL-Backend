@@ -176,5 +176,7 @@ def main():
         # print(sortedValue)
     thullu(totalPlyerSorted)
 
-
-main()
+if __name__ == "__main__":
+    main()
+    # print(cardDistribute(2))
+    #

@@ -17,7 +17,15 @@ class CreateRoomSerializer(serializers.Serializer):
         room = Room.objects.create(room_name=roomName, room_password=roomPassword, created_by=user)
         room.player.add(user)
 
-        return validated_data
+        re = {
+            "room_id": room.id,
+            "user_id": user.id,
+            "username": user.username,
+            "profile_pic": user.photo.url,
+            "status": "playing"
+        }
+
+        return re
 
 
 class JoinRoomSerializer(serializers.Serializer):
@@ -35,7 +43,17 @@ class JoinRoomSerializer(serializers.Serializer):
         room = Room.objects.get(room_name=roomName, room_password=roomPassword)
         
         room.player.add(player)
+        
         return validated_data
+        # re = {
+        #     "room_id": room.id,
+        #     "user_id": player.id,
+        #     "username": player.username,
+        #     "profile_pic": player.photo.url,
+        #     "status": "playing"
+        # }
 
+        # return re
+    
 
 
