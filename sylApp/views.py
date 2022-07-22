@@ -10,18 +10,21 @@ class CreateRoomViewset(APIView):
 
     def post(self, request):
         print(request.POST)
-        room_name = request.POST['room_name']
-        room_password = request.POST['room_password']
+        room_name = request.data.get('room_name')
+        room_password =request.data.get('room_password')
         room = Room.objects.filter(room_name=room_name, room_password=room_password)
         if room:
             serializer = JoinRoomSerializer(data=request.data)
+            print(serializer,"serializer")
             serializer.is_valid(raise_exception=True)
-            serializer.save()
-            return Response({"message": "Room Join successfully"}, status=200)
+            data=serializer.save()
+            print(data,"d")
+            return Response({"message": "Room Join successfully" , 'data':data}, status=200)
         else:
             serializer = CreateRoomSerializer(data=request.data)
             if serializer.is_valid():
-                serializer.save()
-                return Response({"message": "Room created successfully"}, status=200)
+                data=serializer.save()
+                print(data,"d")
+                return Response({"message": "Room created successfully",'data':data}, status=200)
             
         

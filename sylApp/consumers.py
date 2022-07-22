@@ -6,7 +6,7 @@ from asgiref.sync import sync_to_async
 from asgiref.sync import async_to_sync
 import random
 from channels.layers import get_channel_layer
-
+from sylApp.main import thullu
 
 
 def cardDistribute(player):
@@ -24,16 +24,18 @@ def cardDistribute(player):
    totalNumberOfCard = 52
    for j in range(player):
 
-       singlePlayer = []
+       singlePlayer = {"command":"your_cards" , "cards":[]}
        for k in range(totalNumberOfCard//player):
            givenvalue = random.choice(totalCards)
-           singlePlayer.append(givenvalue)
+           L = len(givenvalue)
+           singlePlayer["cards"].append({'number':givenvalue[:-1], 'symbol':givenvalue[L-1]})
            totalCards.remove(givenvalue)
        allPlayers.append(singlePlayer)
 
    for i in range(totalNumberOfCard%player):
        givenvalue = random.choice(totalCards)
-       allPlayers[i].append(givenvalue)
+       L = len(givenvalue)
+       allPlayers[i+1]["cards"].append({'number':givenvalue[:-1], 'symbol':givenvalue[L-1]})
        totalCards.remove(givenvalue)
    return allPlayers
 
@@ -64,15 +66,7 @@ class SYLConsumer(AsyncWebsocketConsumer):
 
     messages = []
     room = {}
-    def send_channel_message(group_name, message):
-        channel_layer = get_channel_layer()
-        async_to_sync(channel_layer.group_send)(
-            '{}'.format(group_name),
-            {
-                'type': 'channel_message',
-                'message': message
-            }
-        )
+
     def join_chat(self,username):
         key = self.room_id
         print(key,"--------------------------------------")
@@ -83,7 +77,7 @@ class SYLConsumer(AsyncWebsocketConsumer):
         else:
             value.append(username)
             self.room[key]=value
-            re = self.room 
+            re = self.room
         return re
 
     def leave_chat(self, username):
@@ -114,9 +108,16 @@ class SYLConsumer(AsyncWebsocketConsumer):
         self.user_id = self.scope['url_route']['kwargs']['user_id']
         # self.room_group_name = 'chat_%s' % self.room_id
         username = await self.get_username(self.user_id)
+        self.user_group_name = '_%s' % self.user_id
         self.room_group_name = '_%s' % self.room_id
-        print(self.scope)
+        print(self.user_id,"fdfd")
         
+        # Join user group
+        await self.channel_layer.group_add(
+            self.user_group_name,
+            self.channel_name
+        )
+
         # Join room group
         await self.channel_layer.group_add(
             self.room_group_name,
@@ -124,6 +125,23 @@ class SYLConsumer(AsyncWebsocketConsumer):
         )
         await self.accept()
         self.join_chat(self.user_id),
+        return await self.channel_layer.group_send(
+                self.user_group_name,
+                {
+                'type': 'chat_message',  
+                "message":{
+                            "command": "new_player",
+                            "user": [{
+                            "id": self.user_id,
+                            "username":username,
+                            # "profile_pic": "url",
+                            "status": "watchig",
+                         }
+                        ]
+                    }
+                # "message": {self.room_id:self.room[self.room_id],'owner':self.room[self.room_id][0]}
+                }
+                )
         # self.messages.append({"msg": f"{ self.user_id } Join Group", "id": self.user_id, "username": self.user_id})
 
         # if len(self.playerCount) == 8:
@@ -151,8 +169,9 @@ class SYLConsumer(AsyncWebsocketConsumer):
 
     # Receive message from WebSocket
     async def receive(self, text_data):
-        channel_layer = get_channel_layer()
         key = self.room_id
+        user_ids = self.room[key]
+        cards = cardDistribute(len(user_ids))
         print(text_data,"-----------------------------------------------------")
         text_data_json = text_data
         print(text_data_json,"--------------------------------------")
@@ -161,30 +180,34 @@ class SYLConsumer(AsyncWebsocketConsumer):
         message = text_data_json
         print(message,"message")
         if message == "distribute":
-            va = self.room[key]
-            print("--------------------------------------", len(va))
-            cards = cardDistribute(len(va))
-            for i in range(len(va)):
-                print(cards[i])
-                # await(channel_layer.group_send)(
-                # '{}'.format(va[i]),
-                # {
-                #     'type': 'channel_message',
-                #     'message': cards[i]
-                # }
-                # )
+            user_ids = self.room[key]
+            print("--------------------------------------", len(user_ids))
+            cards = cardDistribute(len(user_ids))
+            for i in range(len(user_ids)):
+                print(cards[i],"222")
+                self.user_group_name = '_%s' % user_ids[i]
                 await self.channel_layer.group_send(
-                self.room_group_name,
+                self.user_group_name,
                 {
                 'type': 'chat_message',
-                "id": self.user_id,
-                "username": username,
+                "id":  user_ids[i],
+                "username": user_ids[i],
                 "profile_pic": "url",
                 "status": "playing",
                 "message": cards[i]
                 }
                 )
-               
+              
+        elif message == "turn":
+            turn = thullu(cards)
+            print(turn)
+            await self.channel_layer.group_send(
+                self.room_group_name,
+                {
+                'type': 'chat_message',
+                "message": turn
+                }
+                )
 
             # await self.channel_layer.group_send(
             # self.room_group_name,
@@ -242,6 +265,6 @@ class SYLConsumer(AsyncWebsocketConsumer):
         await self.send(text_data=json.dumps({
             'message': message,
             # 'image': image,
-            'sender': sender,
+            # 'sender': sender,
             # 'total':total
         }))

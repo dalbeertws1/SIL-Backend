@@ -10,48 +10,48 @@ def restriction(l1,last_card):
         return newlist
 
 
-def thullu(allSortedCard):
+def thullu(allplayers):
+   card = []
+   print(allplayers,"sdsdssdd")
+   turn_starting_player = 0
+   temp1 = 0 
+   for i in range(len(allplayers)):
+       for j in range(len(allplayers)):
+            if "14♠" in allplayers[j]:
+                return {'player':j+1}
+       if i==0:
+           card = []
+       if len(card)>=1:
+           restriction(allplayers[i], card[len(card)-1])
+       givencard=str(input(f"Player{i+1}:enter the card you want to display: "))
+       card.append(givencard)
+       allplayers[i].remove(givencard)
+       if i >= 1:
+           last_card = card[i-1]
+           if givencard[len(givencard)-1] != last_card[len(last_card)-1] :
+               if len(card)==2:
+                   allplayers[0].extend(card)
+                   return allplayers ,{'player':turn_starting_player+1}
+               else:
+                   for j in range(len(card)):
+                       a=card[j]
+                       if  int(temp1) < int(a[slice(-1)]):
+                           temp1 = a[slice(-1)]
+                           turn_starting_player = j
+                   allplayers[turn_starting_player].extend(card)
+               return allplayers ,{'player':turn_starting_player+1}
+           else:
+                if len(card)==len(allplayers):
+                    for j in range(len(card)):
+                        a=card[j]
+                        if  int(temp1) < int(a[slice(-1)]):
+                            temp1 = a[slice(-1)]
+                            turn_starting_player = j
+                    return {'player':turn_starting_player+1}
+        
+             
 
-    for i in range(len(allSortedCard)):
-       print(allSortedCard[i])
-
-    running = True
-
-    card = []
-    allplayers = allSortedCard
-    loopInc = 0
-    while running ==  True:
-
-        for i in range(len(allplayers)):
-            if i==0:
-                card = []
-            # if len(card)>1:
-                # restriction(allplayers[i], card[len(card)-1])
-            givencard=str(input(f"Player{i+1}:enter the card you want to display: "))
-            card.append(givencard)
-            allplayers[i].remove(givencard)
-            if loopInc != 0:
-                if i >= 1:
-                    c = card[i-1]
-                    if givencard[len(givencard)-1] != c[len(c)-1] :
-                        if len(card)==2:
-                            allplayers[0].extend(card)
-                            break
-                        else:
-                            for j in range(len(card)):
-                                a=card[j]
-                                if  int(temp1) < int(a[slice(-1)]):
-                                    print(temp1)
-                                    temp1 = a[slice(-1)]
-                                    temp = j
-                            allplayers[temp].extend(card)
-                            break
-        loopInc += 1
-        print(allplayers)
-        print(card)
-        if len(allplayers)<1:
-            running = False
-
+                
 
 
    # card = []
