@@ -6,13 +6,15 @@ from asgiref.sync import sync_to_async
 from asgiref.sync import async_to_sync
 import random
 from channels.layers import get_channel_layer
-from sylApp.main import thullu
+from sylApp.main import thullu , user_card_return
+import json
 
 
 def cardDistribute(player):
 
    totalCards = []
-   givenCardUnicode = ["♣","♦","♥","♠"]
+   givenCardUnicode = ["♣","'♦'","♥","♠"]
+   turn = 0
 
    for i in range(len(givenCardUnicode)):
        for j in range(2,15):
@@ -24,9 +26,13 @@ def cardDistribute(player):
    totalNumberOfCard = 52
    for j in range(player):
 
-       singlePlayer = {"command":"your_cards" , "cards":[]}
+       singlePlayer = {"command":"your_cards" , "cards":[],"first_turn":""}
        for k in range(totalNumberOfCard//player):
            givenvalue = random.choice(totalCards)
+           if givenvalue=="14♠":
+              print(j,"gddddddddddddddddddddddddddddddddddddddddddddddddddd")
+              turn  = j
+              singlePlayer["first_turn"]=j
            L = len(givenvalue)
            singlePlayer["cards"].append({'number':givenvalue[:-1], 'symbol':givenvalue[L-1]})
            totalCards.remove(givenvalue)
@@ -37,6 +43,9 @@ def cardDistribute(player):
        L = len(givenvalue)
        allPlayers[i+1]["cards"].append({'number':givenvalue[:-1], 'symbol':givenvalue[L-1]})
        totalCards.remove(givenvalue)
+
+   for b in range(player):
+        allPlayers[b]["first_turn"]=turn
    return allPlayers
 
 
@@ -66,6 +75,7 @@ class SYLConsumer(AsyncWebsocketConsumer):
 
     messages = []
     room = {}
+    all_players_cards = {}
 
     def join_chat(self,username):
         key = self.room_id
@@ -126,7 +136,7 @@ class SYLConsumer(AsyncWebsocketConsumer):
         await self.accept()
         self.join_chat(self.user_id),
         return await self.channel_layer.group_send(
-                self.user_group_name,
+                self.room_group_name,
                 {
                 'type': 'chat_message',  
                 "message":{
@@ -134,7 +144,7 @@ class SYLConsumer(AsyncWebsocketConsumer):
                             "user": [{
                             "id": self.user_id,
                             "username":username,
-                            # "profile_pic": "url",
+                            # "all_user":self.room[self.room_id],
                             "status": "watchig",
                          }
                         ]
@@ -174,17 +184,24 @@ class SYLConsumer(AsyncWebsocketConsumer):
         cards = cardDistribute(len(user_ids))
         print(text_data,"-----------------------------------------------------")
         text_data_json = text_data
-        print(text_data_json,"--------------------------------------")
+        print(type(text_data_json),"--------------------------------------")
         username = self.scope['url_route']['kwargs']['user_id']
         print(username,"--------------------------------------")
-        message = text_data_json
-        print(message,"message")
-        if message == "distribute":
+        message = json.loads(text_data_json)
+        print(type(message),"fdfdfdffdfdfdfdfdfdffdfdf")
+        if message["command"]== "distribute":
             user_ids = self.room[key]
-            print("--------------------------------------", len(user_ids))
+            print(user_ids,"1111111111111111")
             cards = cardDistribute(len(user_ids))
+            print(cards,"cardscardscardscardscardscardscardscardscards")
             for i in range(len(user_ids)):
-                print(cards[i],"222")
+                if len(self.all_players_cards) <1:
+                    self.all_players_cards[key]={user_ids[i]:cards[i]['cards']}
+                else:
+                      self.all_players_cards[key][user_ids[i]]=cards[i]['cards']
+                card=cards[i]
+                ele=card['first_turn']
+                card['first_turn']=user_ids[int(ele)]
                 self.user_group_name = '_%s' % user_ids[i]
                 await self.channel_layer.group_send(
                 self.user_group_name,
@@ -194,18 +211,16 @@ class SYLConsumer(AsyncWebsocketConsumer):
                 "username": user_ids[i],
                 "profile_pic": "url",
                 "status": "playing",
-                "message": cards[i]
+                "message": card
                 }
                 )
-              
-        elif message == "turn":
-            turn = thullu(cards)
-            print(turn)
+        elif message["command"] == "my_play":
+            reply = user_card_return(message["card"] , self.all_players_cards, message["user_data"]["user_id"] , message["user_data"]["room_id"],user_ids)
             await self.channel_layer.group_send(
                 self.room_group_name,
                 {
                 'type': 'chat_message',
-                "message": turn
+                "message": reply
                 }
                 )
 
