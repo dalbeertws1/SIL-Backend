@@ -31,6 +31,7 @@ def update_turn(user_id,all_user_play ,key_list,all_user_cards , room_id , all_u
     turns=turns+1
     turn_starting_player = 0
     key_list = key_list
+    temp1 = 0
     # working on this "function"
     if turns ==1 :
         for i in range(len(key_list)):
@@ -44,24 +45,37 @@ def update_turn(user_id,all_user_play ,key_list,all_user_cards , room_id , all_u
             if  int(temp1) < int(a['number']):
                 temp1 = a['number']
                 turn_starting_player = key_list[k]
-                return({"turn":turn_starting_player})
+                return({"turn":turn_starting_player , "all_user_cards":all_user_cards})
 
     for i in range(len(all_user_id)):
         if all_user_id[i]==user_id:
             if len(all_user_id)==i+1:
                 if turns<len(all_user_id):
-                    turn = all_user_id[0]
-                    return({"turn":turn})
+                    if len(all_user_cards[room_id][all_user_id[0]]) ==0:
+                        user_id = all_user_id[i+1]
+                        continue
+                    else:
+                        turn = all_user_id[0]
+                        return({"turn":turn,"all_user_cards":all_user_cards})
             else:
                 if turns<len(all_user_id):
-                    for j in range(len(all_user_id)):
-                        if all_user_id[i]==user_id:
-                            if len(all_user_cards[room_id][all_user_id[j]]) !=0:
-                                turn = all_user_id[j+1]
-                                return({"turn":turn})
-
-
-
+                    if len(all_user_cards[room_id][all_user_id[i+1]]) ==0:
+                        user_id = all_user_id[i+1]
+                        continue
+                    else:
+                        turn = all_user_id[i+1]
+                        return({"turn":turn,"all_user_cards":all_user_cards})
+                    
+                    # for j in range(len(all_user_id)):
+                    #     if all_user_id[j]==user_id:
+                    #         if len(all_user_cards[room_id][all_user_id[j+1]]) !=0:
+                    #             if len(all_user_id)!=i+1:
+                    #                 turn = all_user_id[j+1]
+                    #                 return({"turn":turn,"all_user_cards":all_user_cards})
+                    #             else:
+                    #                 turn = all_user_id[0]
+                    #                 return({"turn":turn,"all_user_cards":all_user_cards})
+                       
 all_user_play = {} 
 def user_card_return(user_play , all_user_cards, user_id, room_id,all_user_id):
     user_play=user_play
@@ -83,7 +97,7 @@ def user_card_return(user_play , all_user_cards, user_id, room_id,all_user_id):
             print(all_user_cards)
             if len(all_user_play)>1:
                 print("thulluthulluthulluthulluthulluthulluthulluthulluthulluthulluthulluthulluthulluthullu")
-                re = thullu(user_play , all_user_cards,room_id,all_user_id,user_id)
+                re = thullu(user_play , all_user_cards,room_id,all_user_id,key_list,user_id)
                 return re
             else:
                 print("update_turnupdate_turnupdate_turnupdate_turnupdate_turnupdate_turnupdate_turnupdate_turnupdate_turnupdate_turnupdate_turn")

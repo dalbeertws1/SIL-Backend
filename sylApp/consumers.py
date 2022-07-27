@@ -204,7 +204,7 @@ class SYLConsumer(AsyncWebsocketConsumer):
         username = self.scope['url_route']['kwargs']['user_id']
         message = json.loads(text_data_json)
         if message["command"]== "distribute":
-            if len(user_ids)<1:
+            if len(user_ids)>1:
                 room = await self.get_roomname(self.room_id)
                 print(room,"roomroomroomroomroomroomroomroomroom")
                 if room == message["user_id"]:
@@ -212,7 +212,7 @@ class SYLConsumer(AsyncWebsocketConsumer):
                     print(user_ids,"1111111111111111")
                     cards = cardDistribute(len(user_ids))
                     print(cards,"cardscardscardscardscardscardscardscardscards")
-                    for i in range(len(user_ids)):
+                    for i in range(0,8):
                         if len(self.all_players_cards) <1:
                             self.all_players_cards[key]={user_ids[i]:cards[i]['cards']}
                         else:
@@ -241,7 +241,7 @@ class SYLConsumer(AsyncWebsocketConsumer):
                         "message": "User is  not a room owner"
                         }
                         )
-            else:
+            else:       
                     print(username,"username")
                     await self.channel_layer.group_send(
                         self.user_group_name,
@@ -251,6 +251,7 @@ class SYLConsumer(AsyncWebsocketConsumer):
                         }
                         )
         elif message["command"] == "my_play":
+            print(message["user_data"]["user_id"],"user_id")
             reply = user_card_return(message["card"] , self.all_players_cards, message["user_data"]["user_id"] , message["user_data"]["room_id"],user_ids)
             print(reply,"replyreplyreplyreplyreplyreplyreplyreply")
             await self.channel_layer.group_send(
