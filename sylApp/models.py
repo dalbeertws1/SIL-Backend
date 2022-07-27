@@ -9,7 +9,7 @@ class Player(models.Model):
 
 
     def __str__(self):
-        return self.username
+        return self.username + str(self.id)
     
 
 class Room(models.Model):

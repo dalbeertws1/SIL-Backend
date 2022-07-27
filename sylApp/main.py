@@ -70,19 +70,18 @@ def user_card_return(user_play , all_user_cards, user_id, room_id,all_user_id):
     global all_user_play
     # temp1 = 0 
     # turn_starting_player=0
+    print(all_user_cards,"+++++++++++++++++++++++++++++++++++++========================",user_play)
     for i in range(len(all_user_cards[room_id][user_id])):
         if all_user_cards[room_id][user_id][i]['number']==user_play['number'] and user_play['symbol']==all_user_cards[room_id][user_id][i]['symbol']:
             all_user_play[user_id]=user_play
             all_user_cards[room_id][user_id].remove(user_play)
             print(all_user_cards)
-            return(all_user_cards)
-            # user_cards.remove(user_cards[i])
-            # if len(all_user_play)>1:
-            #     thullu(user_play , all_user_cards,room_id,all_user_id)
-            # else:
-            #     update_turn(all_user_id,all_user_cards)
-            # # print(user_cards)
-            # break
+            if len(all_user_play)>1:
+                thullu(user_play , all_user_cards,room_id,all_user_id)
+            else:
+                update_turn(all_user_id,all_user_cards)
+            # print(user_cards)
+            break
 
 
 def thullu(user_play,all_user_cards,room_id,all_user_id):
