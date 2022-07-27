@@ -105,9 +105,8 @@ class SYLConsumer(AsyncWebsocketConsumer):
         allPlayer = []
         for i in room[0].player.all():
             allPlayer.append(i.username)
-        room = room[0].created_by
-
-        return allPlayer
+        room = room[0].created_by.id
+        return room
 
     @database_sync_to_async
     def get_username(self, user_id):
@@ -205,30 +204,42 @@ class SYLConsumer(AsyncWebsocketConsumer):
         username = self.scope['url_route']['kwargs']['user_id']
         message = json.loads(text_data_json)
         if message["command"]== "distribute":
-            user_ids = self.room[key]
-            print(user_ids,"1111111111111111")
-            cards = cardDistribute(len(user_ids))
-            print(cards,"cardscardscardscardscardscardscardscardscards")
-            for i in range(len(user_ids)):
-                if len(self.all_players_cards) <1:
-                    self.all_players_cards[key]={user_ids[i]:cards[i]['cards']}
-                else:
-                      self.all_players_cards[key][user_ids[i]]=cards[i]['cards']
-                card=cards[i]
-                ele=card['first_turn']
-                card['first_turn']=user_ids[int(ele)]
-                self.user_group_name = '_%s' % user_ids[i]
-                await self.channel_layer.group_send(
-                self.user_group_name,
-                {
-                'type': 'chat_message',
-                "id":  user_ids[i],
-                "username": user_ids[i],
-                "profile_pic": "url",
-                "status": "playing",
-                "message": card
-                }
-                )
+            room = await self.get_roomname(self.room_id)
+            print(room,"roomroomroomroomroomroomroomroomroom")
+            if room == message["user_id"]:
+                user_ids = self.room[key]
+                print(user_ids,"1111111111111111")
+                cards = cardDistribute(len(user_ids))
+                print(cards,"cardscardscardscardscardscardscardscardscards")
+                for i in range(len(user_ids)):
+                    if len(self.all_players_cards) <1:
+                        self.all_players_cards[key]={user_ids[i]:cards[i]['cards']}
+                    else:
+                          self.all_players_cards[key][user_ids[i]]=cards[i]['cards']
+                    card=cards[i]
+                    ele=card['first_turn']
+                    card['first_turn']=user_ids[int(ele)]
+                    self.user_group_name = '_%s' % user_ids[i]
+                    await self.channel_layer.group_send(
+                    self.user_group_name,
+                    {
+                    'type': 'chat_message',
+                    "id":  user_ids[i],
+                    "username": user_ids[i],
+                    "profile_pic": "url",
+                    "status": "playing",
+                    "message": card
+                    }
+                    )
+            else:
+                 print(username,"username")
+                 await self.channel_layer.group_send(
+                    self.user_group_name,
+                    {
+                    'type': 'chat_message',
+                    "message": "User is  not a room owner"
+                    }
+                    )
         elif message["command"] == "my_play":
             reply = user_card_return(message["card"] , self.all_players_cards, message["user_data"]["user_id"] , message["user_data"]["room_id"],user_ids)
             print(reply,"replyreplyreplyreplyreplyreplyreplyreply")
