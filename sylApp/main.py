@@ -40,11 +40,11 @@ def update_turn(user_id,all_user_play ,key_list,all_user_cards , room_id , all_u
 
     if turns == len(all_user_id):
         for k in range(len(all_user_play)):
-                a=all_user_play[key_list[k]]
-                if  int(temp1) < int(a['number']):
-                    temp1 = a['number']
-                    turn_starting_player = key_list[k]
-                    return({"turn":turn_starting_player})
+            a=all_user_play[key_list[k]]
+            if  int(temp1) < int(a['number']):
+                temp1 = a['number']
+                turn_starting_player = key_list[k]
+                return({"turn":turn_starting_player})
 
     for i in range(len(all_user_id)):
         if all_user_id[i]==user_id:
@@ -54,8 +54,11 @@ def update_turn(user_id,all_user_play ,key_list,all_user_cards , room_id , all_u
                     return({"turn":turn})
             else:
                 if turns<len(all_user_id):
-                    turn = all_user_id[i+1]
-                    return({"turn":turn})
+                    for j in range(len(all_user_id)):
+                        if all_user_id[i]==user_id:
+                            if len(all_user_cards[room_id][all_user_id[j]]) !=0:
+                                turn = all_user_id[j+1]
+                                return({"turn":turn})
 
 
 
