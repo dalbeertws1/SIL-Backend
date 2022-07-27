@@ -22,21 +22,20 @@ def restriction(l1,last_card):
 
 # user_play , user_cards , user_id , all_user_id
 turns = 0
-def update_turn(user_id,all_user_play ,key_list,all_user_cards , room_id):
-    all_user_play ={31:{'number':'1' , 'symbol':"♠"},32:{'number':'2' , 'symbol':"♠"}, 
-    30:{'number': '12', 'symbol': '♥'}}
-    all_user_id=[30,31,32]
+def update_turn(user_id,all_user_play ,key_list,all_user_cards , room_id , all_user_id):
+    all_user_play =all_user_play
+    all_user_id=all_user_id
     user_id = user_id
     turn=0
     global turns
     turns=turns+1
     turn_starting_player = 0
-    key_list = [31,32,30] 
+    key_list = key_list
     # working on this "function"
     if turns ==1 :
         for i in range(len(key_list)):
            for j in range(0,int(5/52)+1):
-                if all_user_cards[room_id][key_list[j]]['number']=='14' and all_user_cards[room_id][key_list[j]]['symbol']=="♠":
+                if all_user_cards[room_id][key_list[i]]['number']=='14' and all_user_cards[room_id][key_list[i]]['symbol']=="♠":
                     return {'player':j+1}
 
     if turns == len(all_user_id):
@@ -45,17 +44,18 @@ def update_turn(user_id,all_user_play ,key_list,all_user_cards , room_id):
                 if  int(temp1) < int(a['number']):
                     temp1 = a['number']
                     turn_starting_player = key_list[k]
+                    return({"turn":turn_starting_player})
 
     for i in range(len(all_user_id)):
         if all_user_id[i]==user_id:
-            turn_index = i
             if len(all_user_id)==i+1:
                 if turns<len(all_user_id):
                     turn = all_user_id[0]
+                    return({"turn":turn})
             else:
                 if turns<len(all_user_id):
                     turn = all_user_id[i+1]
-    print(turn,"turn")
+                    return({"turn":turn})
 
 
 
@@ -66,8 +66,10 @@ def user_card_return(user_play , all_user_cards, user_id, room_id,all_user_id):
     room_id = room_id
     user_id = user_id
     all_user_id=all_user_id
-    
+    key_list = []
     global all_user_play
+    for key in all_user_play.keys():
+        key_list.append(key)
     # temp1 = 0 
     # turn_starting_player=0
     print(all_user_cards,"+++++++++++++++++++++++++++++++++++++========================",user_play)
@@ -77,23 +79,25 @@ def user_card_return(user_play , all_user_cards, user_id, room_id,all_user_id):
             all_user_cards[room_id][user_id].remove(user_play)
             print(all_user_cards)
             if len(all_user_play)>1:
-                thullu(user_play , all_user_cards,room_id,all_user_id)
+                print("thulluthulluthulluthulluthulluthulluthulluthulluthulluthulluthulluthulluthulluthullu")
+                re = thullu(user_play , all_user_cards,room_id,all_user_id,user_id)
+                return re
             else:
-                update_turn(all_user_id,all_user_cards)
-            # print(user_cards)
+                print("update_turnupdate_turnupdate_turnupdate_turnupdate_turnupdate_turnupdate_turnupdate_turnupdate_turnupdate_turnupdate_turn")
+                turn=update_turn(user_id,all_user_play ,key_list,all_user_cards , room_id , all_user_id)
+                return turn
             break
 
 
-def thullu(user_play,all_user_cards,room_id,all_user_id):
+def thullu(user_play,all_user_cards,room_id,all_user_id, key_list , user_id) :
     global all_user_play
+    user_id = user_id
     all_user_cards = all_user_cards
     all_user_id  = all_user_id
     room_id = room_id
-    key_list = []
+    key_list =key_list
     temp1 = 0
     turn_starting_player = 0
-    for key in all_user_play.keys():
-        key_list.append(key)
     last_card = all_user_play[key_list[len(all_user_play)-2]]
     print(last_card)
     if last_card['symbol']!= user_play['symbol']:
@@ -101,7 +105,8 @@ def thullu(user_play,all_user_cards,room_id,all_user_id):
             for i in range(len(key_list)):
                 if all_user_play[key_list[i]] not in  all_user_cards[room_id][key_list[len(all_user_play)-2]]:
                     all_user_cards[room_id][key_list[len(all_user_play)-2]].append(all_user_play[key_list[i]])
-            all_user_play = {}
+                    all_user_play = {}
+                    return {"all_user_cards":all_user_cards, "turn":[key_list[len(all_user_play)-2]]}
 
         # check bigger card
         else:
@@ -110,18 +115,19 @@ def thullu(user_play,all_user_cards,room_id,all_user_id):
                 if  int(temp1) < int(a['number']):
                     temp1 = a['number']
                     turn_starting_player = key_list[k]
-            print(turn_starting_player,"sdsdsdsd")
             for d in range(len(key_list)):
                 if all_user_play[key_list[d]] not in  all_user_cards[room_id][turn_starting_player]:
                     all_user_cards[room_id][turn_starting_player].append(all_user_play[key_list[d]])
-            all_user_play = {}
-
+                    all_user_play = {}
+                    return {"all_user_cards":all_user_cards, "turn":turn_starting_player}
     # saar
     else:
-        update_turn(all_user_id)
+        next_turn=update_turn(user_id,all_user_play ,key_list,all_user_cards , room_id , all_user_id)
+        return next_turn
     if len(all_user_id)==len(all_user_play):
-        turn=update_turn(all_user_play , key_list)
+        next_turn=update_turn(user_id,all_user_play ,key_list,all_user_cards , room_id , all_user_id)
         all_user_play = {}
+        return next_turn
 
     # for j in  range(len(all_user_id)):
     #     if user_id == all_user_id[i]:
