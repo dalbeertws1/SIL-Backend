@@ -211,15 +211,18 @@ class SYLConsumer(AsyncWebsocketConsumer):
                     user_ids = self.room[key]
                     print(user_ids,"1111111111111111")
                     cards = cardDistribute(len(user_ids))
-                    print(cards,"cardscardscardscardscardscardscardscardscards")
-                    for i in range(0,8):
+                    playing_player=len(user_ids)
+                    if len(user_ids)>8:
+                        playing_player=8
+                    for i in range(0 , playing_player):
                         if len(self.all_players_cards) <1:
                             self.all_players_cards[key]={user_ids[i]:cards[i]['cards']}
                         else:
                             self.all_players_cards[key][user_ids[i]]=cards[i]['cards']
                         card=cards[i]
-                        ele=card['first_turn']
-                        card['first_turn']=user_ids[int(ele)]
+                        turn_index=card['first_turn']
+                        card['first_turn']=user_ids[int(turn_index)]
+                        del card['first_turn']
                         self.user_group_name = '_%s' % user_ids[i]
                         await self.channel_layer.group_send(
                         self.user_group_name,
@@ -232,6 +235,17 @@ class SYLConsumer(AsyncWebsocketConsumer):
                         "message": card
                         }
                         )
+                    await self.channel_layer.group_send(
+                    self.room_group_name,
+                    {
+                    'type': 'chat_message',
+                    "id":  user_ids[i],
+                    "username": user_ids[i],
+                    "profile_pic": "url",
+                    "status": "playing",
+                    "message": {"Turn":user_ids[int(turn_index)]}
+                    }
+                    )
                 else:
                     print(username,"username")
                     await self.channel_layer.group_send(
@@ -258,7 +272,14 @@ class SYLConsumer(AsyncWebsocketConsumer):
                 self.room_group_name,
                 {
                 'type': 'chat_message',
-                "message": reply
+                "message": {'turn':reply['turn'] , "pool":reply['all_user_play']}
+                }
+                )
+            await self.channel_layer.group_send(
+                self.user_group_name,
+                {
+                'type': 'chat_message',
+                "message": {'command':'your_cards' , 'cards':reply['all_user_cards'][4][ message["user_data"]["user_id"]]}
                 }
                 )
 
