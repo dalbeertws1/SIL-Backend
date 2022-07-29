@@ -104,6 +104,30 @@ class SYLConsumer(AsyncWebsocketConsumer):
     def get_username(self, user_id):
         user = Player.objects.filter(id = user_id)
         return user[0].username
+    
+    @database_sync_to_async
+    def get_users(self , room_id):
+        d = 0
+        res = []
+        users = Room.objects.get(id = room_id).player.all()
+        for user in users:
+            d = d+1
+            if d > 9:      
+                res.append({
+                    "id": user.id,
+                    "username": user.username,
+                    "photo": "https://silcards.herokuapp.com/" + user.photo.url,
+                    "status":"Playing"
+                })
+            else:
+                 res.append({
+                    "id": user.id,
+                    "username": user.username,
+                    "photo": "https://silcards.herokuapp.com" + user.photo.url,
+                    "status":"Watching"
+                })
+                
+        return res
 
 
     async def connect(self):
@@ -128,40 +152,18 @@ class SYLConsumer(AsyncWebsocketConsumer):
         )
         await self.accept()
         self.join_chat(self.user_id),
-        if (len(self.room[self.room_id]))<9:
-            return await self.channel_layer.group_send(
-                    self.room_group_name,
-                    {
-                    'type': 'chat_message',  
-                    "message":{
-                                "command": "new_player",
-                                "user": [{
-                                "id": self.user_id,
-                                "username":username,
-                                # "all_user":self.room[self.room_id],
-                                "status": "Playing",
-                             }
-                            ]
-                        }
+        users = await self.get_users(self.room_id)
+        return await self.channel_layer.group_send(
+                self.room_group_name,
+                {
+                'type': 'chat_message',  
+                "message":{
+                            "command": "new_player",
+                            "user": users
                     }
-                    )
-        else:
-              return await self.channel_layer.group_send(
-                    self.room_group_name,
-                    {
-                    'type': 'chat_message',  
-                    "message":{
-                                "command": "new_player",
-                                "user": [{
-                                "id": self.user_id,
-                                "username":username,
-                                # "all_user":self.room[self.room_id],
-                                "status": "Watching",
-                             }
-                            ]
-                        }
-                    }
-                    )
+                }
+                )
+      
         # self.messages.append({"msg": f"{ self.user_id } Join Group", "id": self.user_id, "username": self.user_id})
 
         # if len(self.playerCount) == 8:
@@ -235,7 +237,7 @@ class SYLConsumer(AsyncWebsocketConsumer):
                     "username": user_ids[i],
                     "profile_pic": "url",
                     "status": "playing",
-                    "message": {"Turn":user_ids[int(turn_index)]}
+                    "message": {"command": "turn" , "player_id" : user_ids[int(turn_index)]}
                     }
                     )
                 else:
