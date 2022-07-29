@@ -260,7 +260,7 @@ class SYLConsumer(AsyncWebsocketConsumer):
                 self.room_group_name,
                 {
                 'type': 'chat_message',
-                "message": {'turn':reply['turn'] , "pool":reply['all_user_play']}
+                "message": {"command": "turn" , "player_id" : reply['turn'] ,  "pool":reply['all_user_play']}
                 }
                 )
             await self.channel_layer.group_send(
