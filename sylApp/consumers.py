@@ -63,14 +63,6 @@ def cardDistribute(player):
 
 
 
-
-
-
-
-
-
-
-
 class SYLConsumer(AsyncWebsocketConsumer):
 
     messages = []
