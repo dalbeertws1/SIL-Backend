@@ -10,6 +10,7 @@ channels-redis==2.4.2
 constantly==15.1.0
 cryptography==37.0.4
 daphne==3.0.2
+Deprecated==1.2.13
 Django==4.0.6
 django-cors-headers==3.13.0
 djangorestframework==3.13.1
@@ -18,12 +19,15 @@ hyperlink==21.0.0
 idna==3.3
 incremental==21.3.0
 msgpack==0.6.2
+packaging==21.3
 Pillow==9.2.0
 pyasn1==0.4.8
 pyasn1-modules==0.2.8
 pycparser==2.21
 pyOpenSSL==22.0.0
+pyparsing==3.0.9
 pytz==2022.1
+redis==4.3.4
 service-identity==21.1.0
 six==1.16.0
 sqlparse==0.4.2
@@ -32,4 +36,5 @@ twisted-iocpsupport==1.0.2
 txaio==22.2.1
 typing_extensions==4.3.0
 tzdata==2022.1
+wrapt==1.14.1
 zope.interface==5.4.0
