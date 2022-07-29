@@ -9,7 +9,7 @@ https://docs.djangoproject.com/en/4.0/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.0/ref/settings/
 """
-
+import django_heroku
 import os
 from pathlib import Path
 
@@ -75,7 +75,7 @@ TEMPLATES = [
     },
 ]
 
-# WSGI_APPLICATION = 'SYL.wsgi.application'
+WSGI_APPLICATION = 'SYL.wsgi.application'
 
 ASGI_APPLICATION = 'SYL.asgi.application'
 
@@ -151,3 +151,6 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 # https://docs.djangoproject.com/en/4.0/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# Activate Django-Heroku.
+django_heroku.settings(locals())
