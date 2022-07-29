@@ -14,9 +14,10 @@ from django.core.asgi import get_asgi_application
 from channels.routing import ProtocolTypeRouter, URLRouter
 
 from sylApp import routing
+import django
 
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'SYL.settings')
-
+django.setup()
 
 application = ProtocolTypeRouter(
     {
