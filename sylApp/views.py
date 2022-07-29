@@ -1,6 +1,5 @@
-from .models import Room, Player
+from .models import Room
 from .serializer import CreateRoomSerializer, JoinRoomSerializer
-from rest_framework import viewsets 
 from rest_framework.views import APIView
 from rest_framework.response import Response
 
