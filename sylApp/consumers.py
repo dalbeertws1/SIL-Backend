@@ -109,22 +109,17 @@ class SYLConsumer(AsyncWebsocketConsumer):
     def get_users(self , room_id):
         res = []
         users = Room.objects.get(id = room_id).player.all()
+        
         for i , user in enumerate(users):
             
-            if i < 8:      
-                res.append({
-                    "id": user.id,
-                    "username": user.username,
-                    "photo": "https://silcards.herokuapp.com/" + user.photo.url,
-                    "status":"Playing"
-                })
-            else:
-                 res.append({
+            status = "playing" if i<8 else "Watching"
+            res.append({
                     "id": user.id,
                     "username": user.username,
                     "photo": "https://silcards.herokuapp.com" + user.photo.url,
-                    "status":"Watching"
-                })
+                    "status":status
+                })      
+
                 
         return res
 
