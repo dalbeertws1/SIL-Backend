@@ -129,11 +129,13 @@ def thullu(user_play,all_user_cards,room_id,all_user_id, key_list , user_id) :
     # saar
     else:
         next_turn=update_turn(user_id,all_user_play ,key_list,all_user_cards , room_id , all_user_id)
-        return next_turn
+        return {"all_user_cards":all_user_cards, "turn":next_turn , "all_user_play":all_user_play}
     if len(all_user_id)==len(all_user_play):
         next_turn=update_turn(user_id,all_user_play ,key_list,all_user_cards , room_id , all_user_id)
         all_user_play = {}
-        return next_turn
+        return {"all_user_cards":all_user_cards, "turn":next_turn , "all_user_play":all_user_play}
+    
+    #CHECKING ON ABOVE PROGRAM
 
     # for j in  range(len(all_user_id)):
     #     if user_id == all_user_id[i]:
