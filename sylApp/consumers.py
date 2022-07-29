@@ -107,12 +107,11 @@ class SYLConsumer(AsyncWebsocketConsumer):
     
     @database_sync_to_async
     def get_users(self , room_id):
-        d = 0
         res = []
         users = Room.objects.get(id = room_id).player.all()
-        for user in users:
-            d = d+1
-            if d > 9:      
+        for i , user in enumerate(users):
+            
+            if i < 8:      
                 res.append({
                     "id": user.id,
                     "username": user.username,
