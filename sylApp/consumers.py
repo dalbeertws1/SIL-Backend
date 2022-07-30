@@ -193,6 +193,7 @@ class SYLConsumer(AsyncWebsocketConsumer):
         message = json.loads(text_data_json)
         if message["command"]== "distribute":
             if len(user_ids)>1:
+                print(self.room_id,"self.roomself.roomself.roomself.roomself.roomself.roomself.roomself.roomself.roomself.room")
                 room = await self.get_roomname(self.room_id)
                 print(room,"roomroomroomroomroomroomroomroomroom")
                 if room == message["user_id"]:
@@ -267,7 +268,7 @@ class SYLConsumer(AsyncWebsocketConsumer):
                 self.user_group_name,
                 {
                 'type': 'chat_message',
-                "message": {'command':'your_cards' , 'cards':reply['all_user_cards'][4][ message["user_data"]["user_id"]]}
+                "message": {'command':'your_cards' , 'cards':reply['all_user_cards'][self.room_id][message["user_data"]["user_id"]]}
                 }
                 )
 
