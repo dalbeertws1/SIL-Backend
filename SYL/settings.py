@@ -154,3 +154,5 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # Activate Django-Heroku.
 django_heroku.settings(locals())
+
+CSRF_TRUSTED_ORIGINS = [" https://silcards.herokuapp.com"]
