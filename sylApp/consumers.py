@@ -256,12 +256,15 @@ class SYLConsumer(AsyncWebsocketConsumer):
         elif message["command"] == "my_play":
             print(message["user_data"]["user_id"],"user_id")
             reply = user_card_return(message["card"] , self.all_players_cards, message["user_data"]["user_id"] , message["user_data"]["room_id"],user_ids)
+            pool = []
+            for values in reply['all_user_play'].values():
+                pool.append(values)
             print(reply,"replyreplyreplyreplyreplyreplyreplyreply")
             await self.channel_layer.group_send(
                 self.room_group_name,
                 {
                 'type': 'chat_message',
-                "message": {"command": "turn" , "player_id" : reply['turn'] ,  "pool":reply['all_user_play']}
+                "message": {"command": "turn" , "player_id" : reply['turn'] ,  "pool":pool}
                 }
                 )
             await self.channel_layer.group_send(
