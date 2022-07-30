@@ -204,7 +204,7 @@ class SYLConsumer(AsyncWebsocketConsumer):
                     if len(user_ids)>8:
                         playing_player=8
                     for i in range(0 , playing_player):
-                        if len(self.all_players_cards) <1:
+                        if key  not in self.all_players_cards.keys():
                             self.all_players_cards[key]={user_ids[i]:cards[i]['cards']}
                         else:
                             self.all_players_cards[key][user_ids[i]]=cards[i]['cards']
